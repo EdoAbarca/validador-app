@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock  # Para usar Docker desde Jenkins
+    networks:
+      - jenkins-net
+
+  app: 
+    build:
+      context: ./validador-app
+      dockerfile: Dockerfile
+    container_name: validador-app
+    networks:
+      - jenkins-net
+    stdin_open: true
+    tty: true
+
+  #SonarQube
+  sonarqube:
+    image: sonarqube:9.9-community
+    ports:
+      - "9000:9000"
+    environment:
+      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+
+networks:
+  jenkins-net:
+
+volumes:
+  jenkins_home:

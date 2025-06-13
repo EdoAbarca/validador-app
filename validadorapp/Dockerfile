@@ -1,12 +1,13 @@
-# Etapa 1: Construcción con Maven y JDK
-FROM maven:3.9-eclipse-temurin-17 AS build
+FROM eclipse-temurin:17-jdk-jammy as builder
 WORKDIR /app
-COPY . .
-RUN mvn clean verify
+COPY .mvn/ .mvn
+COPY mvnw pom.xml ./
+RUN ./mvnw dependency:go-offline
+COPY src ./src
+RUN ./mvnw package -DskipTests
 
-# Etapa 2: Imagen final optimizada
-FROM eclipse-temurin:17-jdk
+FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

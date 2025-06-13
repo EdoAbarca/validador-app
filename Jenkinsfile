@@ -6,6 +6,7 @@ pipeline {
         APP_NAME = 'eddindocker/validador-app'
         APP_VERSION = 'latest'
         SONARQUBE_SCANNER = 'sonarqube-scanner'
+        SONARQUBE_TOKEN = credentials('sonarqube-token') // Credencial guardada en Jenkins
     }
 
     stages {
@@ -31,7 +32,8 @@ pipeline {
                     sh """
                     mvn sonar:sonar \
                         -Dsonar.projectKey=validador-app \
-                        -Dsonar.host.url=http://sonarqube:9000
+                        -Dsonar.host.url=http://sonarqube:9000 \
+                        -Dsonar.login=${SONARQUBE_TOKEN}
                     """
                 }
             }
